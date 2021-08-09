@@ -1,12 +1,15 @@
-import boto3
+# import boto3
 import folium
 from math import sin, cos, sqrt, atan2, radians
 import datetime
-import pytz   
+import pytz 
+from MongoDB_Main import Document  
 
-cli = boto3.client('s3')
+# cli = boto3.client('s3')
 radius = 2
 
+# Mongo DB Document Class
+doc = Document()
 
 def gps_one(lat, lon):
     mapit = folium.Map(location=[lat, lon], zoom_start=15)
@@ -49,11 +52,12 @@ def gps_main(lat, lon, lat_live, lon_live):
     print("Result:")
     print("In KM.   : ", distance, "km")
     print("In meters: ", distance * 1000, "m")
-    cli = boto3.client('s3')
-    cli.put_object(
-        Body=str(distance * 1000),
-        Bucket='ec2-obd2-bucket',
-        Key='GPS/Distance/OBD2--{}.txt'.format(str(datetime.datetime.now())))
+    # cli = boto3.client('s3')
+    # cli.put_object(
+    #     Body=str(distance * 1000),
+    #     Bucket='ec2-obd2-bucket',
+    #     Key='GPS/Distance/OBD2--{}.txt'.format(str(datetime.datetime.now())))
+
 
     if distance * 1000 <= float(radius):
         print("OBD device is under given area")
@@ -190,42 +194,41 @@ def convert_raw_to_information(input_data):
     if len(raw_data) < 8:
         login_data = convert_LOGIN_data(raw_data)
         IMEI = login_data["IMEI"]
+        # MongoDB Log Login Data
+        doc.obdDB_Write(login_data,IMEI)
         # S3 Log Login Data
-        cli.put_object(
-            Body=str(login_data),
-            Bucket='ec2-obd2-bucket',
-            Key='{0}/Login/Log/OBD2--{1}.txt'.format(IMEI,str(dateTimeIND)))
-        
-        # S3 Latest Login Data
-        cli.put_object(
-            Body=str(login_data),
-            Bucket='ec2-obd2-bucket',
-            Key='{0}/Login/Latest/login.txt'.format(IMEI))
+        # cli.put_object(
+        #     Body=str(login_data),
+        #     Bucket='ec2-obd2-bucket',
+        #     Key='{0}/Login/Log/OBD2--{1}.txt'.format(IMEI,str(dateTimeIND)))
         return login_data
+                
 
     # --------- GPS Data ---------
     elif raw_data[1] == "ATL":
         gps_data = convert_GPS_data(raw_data)
         IMEI = gps_data["IMEI"]
+        # MongoDB Log Login Data
+        doc.obdDB_Write(gps_data,IMEI)
         # S3 Log GPS Data
-        cli.put_object(
-            Body=str(gps_data),
-            Bucket='ec2-obd2-bucket',
-            Key='{0}/GPS/Log/OBD2--{1}.txt'.format(IMEI,str(dateTimeIND)))
+        # cli.put_object(
+        #     Body=str(gps_data),
+        #     Bucket='ec2-obd2-bucket',
+        #     Key='{0}/GPS/Log/OBD2--{1}.txt'.format(IMEI,str(dateTimeIND)))
 
-        if raw_data[0] == "L":     
+        # if raw_data[0] == "L":     
             # S3 Latest GPS 'L' Data
-            cli.put_object(
-                Body=str(gps_data),
-                Bucket='ec2-obd2-bucket',
-                Key='{0}/GPS/Latest/L.txt'.format(IMEI))
+            # cli.put_object(
+            #     Body=str(gps_data),
+            #     Bucket='ec2-obd2-bucket',
+            #     Key='{0}/GPS/Latest/L.txt'.format(IMEI))
             
-        elif raw_data[0] == "H":
+        # elif raw_data[0] == "H":
              # S3 Latest GPS 'H' Data
-            cli.put_object(
-                Body=str(gps_data),
-                Bucket='ec2-obd2-bucket',
-                Key='{0}/GPS/Latest/H.txt'.format(IMEI))
+            # cli.put_object(
+            #     Body=str(gps_data),
+            #     Bucket='ec2-obd2-bucket',
+            #     Key='{0}/GPS/Latest/H.txt'.format(IMEI))
         return gps_data
 
     # --------- OBD Data ---------
@@ -233,41 +236,43 @@ def convert_raw_to_information(input_data):
         obd_data = convert_OBD_data(raw_data)
         rpm = calculate_engine_RPM(obd_data)
         IMEI = obd_data["IMEI"]
-        
+        # MongoDB Log Login Data
+        doc.obdDB_Write(obd_data,IMEI)
         if rpm:
             print(f'Engine RPM = {rpm}')
             rpmdata = { 'RPM' : rpm, 'IMEI': IMEI,'timestamp' : dateTimeIND}  
-            cli.put_object(
-                Body=str(rpmdata),
-                Bucket='ec2-obd2-bucket',
-                Key='{0}/Data/{0}_rpm.txt'.format(IMEI))
+            # cli.put_object(
+            #     Body=str(rpmdata),
+            #     Bucket='ec2-obd2-bucket',
+            #     Key='{0}/Data/{0}_rpm.txt'.format(IMEI))
         else:
             print("No RPM data received")
         
         # S3 RPM Data
-        cli.put_object(
-                Body=str(rpm),
-                Bucket='ec2-obd2-bucket',
-                Key='{0}/OBD/Latest/RPM.txt'.format(IMEI))
-        # S3 Log OBD Data
-        cli.put_object(
-            Body=str(obd_data),
-            Bucket='ec2-obd2-bucket',
-            Key='{0}/OBD/Log/OBD2--{1}.txt'.format(IMEI,str(dateTimeIND)))
+        # cli.put_object(
+        #         Body=str(rpm),
+        #         Bucket='ec2-obd2-bucket',
+        #         Key='{0}/OBD/Latest/RPM.txt'.format(IMEI))
 
-        if raw_data[0] == "L":     
+        # S3 Log OBD Data
+        # cli.put_object(
+        #     Body=str(obd_data),
+        #     Bucket='ec2-obd2-bucket',
+        #     Key='{0}/OBD/Log/OBD2--{1}.txt'.format(IMEI,str(dateTimeIND)))
+
+        # if raw_data[0] == "L":     
             # S3 Latest OBD 'L' Data
-            cli.put_object(
-                Body=str(obd_data),
-                Bucket='ec2-obd2-bucket',
-                Key='{0}/OBD/Latest/L.txt'.format(IMEI))
+            # cli.put_object(
+            #     Body=str(obd_data),
+            #     Bucket='ec2-obd2-bucket',
+            #     Key='{0}/OBD/Latest/L.txt'.format(IMEI))
             
-        elif raw_data[0] == "H":
+        # elif raw_data[0] == "H":
              # S3 Latest GPS 'H' Data
-            cli.put_object(
-                Body=str(obd_data),
-                Bucket='ec2-obd2-bucket',
-                Key='{0}/OBD/Latest/H.txt'.format(IMEI))
+            # cli.put_object(
+            #     Body=str(obd_data),
+            #     Bucket='ec2-obd2-bucket',
+            #     Key='{0}/OBD/Latest/H.txt'.format(IMEI))
 
         return obd_data
     # -----------------------------------
