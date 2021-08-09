@@ -22,11 +22,10 @@ class SocketThread(threading.Thread):
         print ("New connection added: ", clientAddress)
 
     def run(self):
-       
+        self.csocket.settimeout(0.00001)
         # cli = boto3.client('s3')
         while True:
             try:
-                
                 data = self.csocket.recv(1024)
                 if not data:
                     return
@@ -34,11 +33,9 @@ class SocketThread(threading.Thread):
                 with global_lock:
                     IST = pytz.timezone('Asia/Kolkata') 
                     dateTimeIND = datetime.datetime.now(IST).strftime("%Y-%m-%dT%H:%M:%S.%f")
-                    
                     fData = convert_raw_to_information(data)
 
                     if fData["Live/Memory"] == "L":
-                        
                         print("TimeStamp: ", dateTimeIND)
                         print ("Connection from : ", self.clientAddress)
                         print('device number : ' , self.deviceCount)

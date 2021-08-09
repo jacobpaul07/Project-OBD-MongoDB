@@ -196,11 +196,9 @@ def convert_raw_to_information(input_data):
         IMEI = login_data["IMEI"]
         # MongoDB Log Login Data
         doc.obdDB_Write(login_data,IMEI)
-        # S3 Log Login Data
-        # cli.put_object(
-        #     Body=str(login_data),
-        #     Bucket='ec2-obd2-bucket',
-        #     Key='{0}/Login/Log/OBD2--{1}.txt'.format(IMEI,str(dateTimeIND)))
+        col = "OBD Device Status"
+        status = "ON"
+        update = doc.obd_Status(col,IMEI,status)
         return login_data
                 
 
