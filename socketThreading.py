@@ -35,12 +35,15 @@ class SocketThread(threading.Thread):
                     print ("Connection from : ", self.clientAddress)
                     print('device number : ' , self.deviceCount)
                     print('thread identity:{0}, device number: {1}'.format(str(threading.get_ident()),str(self.deviceCount)))
-                    print(data)
-                    
+                    fData = convert_raw_to_information(data)
+                    if fData["Live/Memory"] == "L":
+                        print("Live Data: ",data)
+                    else:
+                        print(" 'H' data Received")
                     if not data:
                         return
 
-                    fData = convert_raw_to_information(data)
+                   
                     IMEI = fData["IMEI"]
                     atIMEI = "@"+IMEI
                     messageType = "00"
