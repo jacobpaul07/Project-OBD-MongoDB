@@ -40,7 +40,6 @@ class SocketThread(threading.Thread):
                     return
 
                 fData = convert_raw_to_information(data)
-                print(json.dumps(fData, indent = 4))
                 IMEI = fData["IMEI"]
                 atIMEI = "@"+IMEI
                 messageType = "00"
