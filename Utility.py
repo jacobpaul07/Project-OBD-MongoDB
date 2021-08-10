@@ -190,7 +190,7 @@ def convert_raw_to_information(input_data):
     input_file = input_file.replace(';', ',')
     raw_data = input_file.split(',')
     # DB Collection
-    col = "OBD_obd"
+    col = "OBD_Device_Status"
     # --------- Check for Login packet ---------
     if len(raw_data) < 8:
         login_data = convert_LOGIN_data(raw_data)
