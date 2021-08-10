@@ -1,32 +1,43 @@
 import datetime
+from socket import socket , timeout
 import threading
 from Utility import convert_raw_to_information,gps_one,gps_main
 # import boto3
 import pytz
 import json
+from MongoDB_Main import Document 
 
 global_lock = threading.Lock()
 stopThread: bool = False
-
+doc = Document()
 
 
 class SocketThread(threading.Thread):
-    def __init__(self,clientAddress,clientsocket,deviceCount):
+    def __init__(self,clientAddress:str ,clientsocket:socket,deviceCount:int):
         threading.Thread.__init__(self)
+        
         self.csocket = clientsocket
         self.clientAddress = clientAddress
+        self.timeout = 300
         self.count = 0
         self.deviceCount = deviceCount
         self.gpslist_lat = []
         self.gpslist_lon = []
+        self.maxRetryCount = 4
+        self.currentRetryCount = 0
+        setTimeout:int = self.timeout / self.maxRetryCount
+        clientsocket.settimeout(setTimeout)
         print ("New connection added: ", clientAddress)
 
     def run(self):
-        self.csocket.settimeout(0.00001)
+        self.start = True
         # cli = boto3.client('s3')
-        while True:
+        while self.start:
             try:
                 data = self.csocket.recv(1024)
+                print(data)  
+                self.currentRetryCount = 0
+
                 if not data:
                     return
 
@@ -53,7 +64,6 @@ class SocketThread(threading.Thread):
                         bytesPacket = bytes(joinedPacket, 'utf-8')
                         print("Return Packet:",bytesPacket)
 
-
                         if fData["Message Type"] == "02" and fData["Live/Memory"] == "L":
                             lat = fData["Latitude"]
                             lon = fData["Longitude"]
@@ -65,7 +75,6 @@ class SocketThread(threading.Thread):
                                     self.gpslist_lon.insert(0,lon)
                                     coordinates = {'Latitude' : lat, 'Longitude' : lon,'IMEI': IMEI, 'timestamp' : dateTimeIND} 
                                     self.count += 1
-
                                     # cli.put_object(
                                     #     Body=str(coordinates),
                                     #     Bucket='ec2-obd2-bucket',
@@ -88,13 +97,28 @@ class SocketThread(threading.Thread):
                         print ("Client at", self.clientAddress , "Packet Completely Received...")
                     
                     else:
-                        print(" 'H' data Received: ",data)
-
+                        print(" 'H' data Received: ")
+            
+            except timeout as  exception:
+                print("Timeout raised and caught.",exception)
+                self.currentRetryCount = self.currentRetryCount + 1
+                if self.currentRetryCount > self.maxRetryCount:
+                    status:str = "OFF"
+                    col = "OBD_Device_Status"
+                    print("Device",status)
+                    doc.obd_Status(col,IMEI,status)
+                    self.csocket.close()
+                    self.start = False
+                    self.currentRetryCount = 0
+                else:
+                    status:str = "IDLE"
+                    col = "OBD_Device_Status"
+                    print("Device",status)
+                    doc.obd_Status(col,IMEI,status)
+ 
             except Exception as exception:
                 print ("Error occured with exception:",exception)
+            
             # print(self.count)
             print("--------------------------------------------------------------------------------------------")
-
-
-         
-        
+      

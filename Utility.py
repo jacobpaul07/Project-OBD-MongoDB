@@ -189,16 +189,34 @@ def convert_raw_to_information(input_data):
     # --------- Data splitting based on comma ---------
     input_file = input_file.replace(';', ',')
     raw_data = input_file.split(',')
-
+    # DB Collection
+    col = "OBD_Device_Status"
     # --------- Check for Login packet ---------
     if len(raw_data) < 8:
         login_data = convert_LOGIN_data(raw_data)
         IMEI = login_data["IMEI"]
         # MongoDB Log Login Data
         doc.obdDB_Write(login_data,IMEI)
-        col = "OBD Device Status"
         status = "ON"
         update = doc.obd_Status(col,IMEI,status)
+        if update == 0:
+            obdStatus = {
+                    "OrgID": "Org001",
+                    "SiteID": "Site001",
+                    "VOB_ID": "VOB001",
+                    "OBD_Tag_ID": "OBDTag001",
+                    "IMEI": IMEI,
+                    "Latitude": "",
+                    "North_South": "",
+                    "Longitude": "",
+                    "East_West": "",
+                    "Internal_battery_Level": "",
+                    "Signal_Strength": "",
+                    "timeout": "300",
+                    "Device_Status": "ON",
+                    "Rpm":""
+                }
+            doc.obdDB_Write(obdStatus,col)
         return login_data
                 
 
@@ -208,18 +226,15 @@ def convert_raw_to_information(input_data):
         IMEI = gps_data["IMEI"]
         # MongoDB Log Login Data
         doc.obdDB_Write(gps_data,IMEI)
-        # S3 Log GPS Data
-        # cli.put_object(
-        #     Body=str(gps_data),
-        #     Bucket='ec2-obd2-bucket',
-        #     Key='{0}/GPS/Log/OBD2--{1}.txt'.format(IMEI,str(dateTimeIND)))
-
-        # if raw_data[0] == "L":     
-            # S3 Latest GPS 'L' Data
-            # cli.put_object(
-            #     Body=str(gps_data),
-            #     Bucket='ec2-obd2-bucket',
-            #     Key='{0}/GPS/Latest/L.txt'.format(IMEI))
+        # MongoDB Device Status Data
+        if raw_data[0] == "L":
+            Latitude = gps_data["Latitude"]
+            NoS = gps_data["North/South"]
+            Longitude = gps_data["Longitude"]
+            EoW = gps_data["East/West"]
+            batLevel = gps_data["Internal battery Level (Volts)"]
+            SignalStrength = gps_data["Signal Strength"]
+            doc.obdDeviceStatusDocument(col,IMEI,Latitude,NoS,Longitude,EoW,batLevel,SignalStrength)     
             
         # elif raw_data[0] == "H":
              # S3 Latest GPS 'H' Data
@@ -234,15 +249,14 @@ def convert_raw_to_information(input_data):
         obd_data = convert_OBD_data(raw_data)
         rpm = calculate_engine_RPM(obd_data)
         IMEI = obd_data["IMEI"]
+        
         # MongoDB Log Login Data
         doc.obdDB_Write(obd_data,IMEI)
         if rpm:
             print(f'Engine RPM = {rpm}')
-            rpmdata = { 'RPM' : rpm, 'IMEI': IMEI,'timestamp' : dateTimeIND}  
-            # cli.put_object(
-            #     Body=str(rpmdata),
-            #     Bucket='ec2-obd2-bucket',
-            #     Key='{0}/Data/{0}_rpm.txt'.format(IMEI))
+            rpmdata = { 'RPM' : rpm, 'IMEI': IMEI,'timestamp' : dateTimeIND}
+            doc.obd_RPM(col,IMEI,rpm)
+
         else:
             print("No RPM data received")
         
