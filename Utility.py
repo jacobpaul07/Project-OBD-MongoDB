@@ -228,13 +228,14 @@ def convert_raw_to_information(input_data):
         doc.obdDB_Write(gps_data,IMEI)
         # MongoDB Device Status Data
         if raw_data[0] == "L":
-            Latitude = gps_data["Latitude"]
-            NoS = gps_data["North/South"]
-            Longitude = gps_data["Longitude"]
-            EoW = gps_data["East/West"]
-            batLevel = gps_data["Internal battery Level (Volts)"]
-            SignalStrength = gps_data["Signal Strength"]
-            doc.obdDeviceStatusDocument(col,IMEI,Latitude,NoS,Longitude,EoW,batLevel,SignalStrength)     
+            if not gps_data["Latitude"] == "":
+                Latitude = gps_data["Latitude"]
+                NoS = gps_data["North/South"]
+                Longitude = gps_data["Longitude"]
+                EoW = gps_data["East/West"]
+                batLevel = gps_data["Internal battery Level (Volts)"]
+                SignalStrength = gps_data["Signal Strength"]
+                doc.obdDeviceStatusDocument(col,IMEI,Latitude,NoS,Longitude,EoW,batLevel,SignalStrength)     
             
         # elif raw_data[0] == "H":
              # S3 Latest GPS 'H' Data
