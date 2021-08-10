@@ -104,7 +104,7 @@ class SocketThread(threading.Thread):
                 self.currentRetryCount = self.currentRetryCount + 1
                 if self.currentRetryCount > self.maxRetryCount:
                     status:str = "OFF"
-                    col = "OBD_Device_Status"
+                    col = "OBD_obd"
                     print("Device",status)
                     doc.obd_Status(col,IMEI,status)
                     self.csocket.close()
@@ -112,7 +112,7 @@ class SocketThread(threading.Thread):
                     self.currentRetryCount = 0
                 else:
                     status:str = "IDLE"
-                    col = "OBD_Device_Status"
+                    col = "OBD_obd"
                     print("Device",status)
                     doc.obd_Status(col,IMEI,status)
  
