@@ -40,7 +40,7 @@ class Document:
         updatedCount = x.matched_count
         return updatedCount
     
-    def obdDeviceStatusDocument(self,col,IMEI,Latitude,NoS,Longitude,EoW,batLevel,SignalStrength):
+    def obdDeviceStatusDocument(self,col,IMEI,Latitude,NoS,Longitude,EoW,batLevel,SignalStrength,status,timeStamp):
         collection = self.db[col]
         myquery = { "IMEI": IMEI }
         newvalues = { "$set": {
@@ -50,6 +50,8 @@ class Document:
             "East_West": EoW,
             "Internal_battery_Level": batLevel,
             "Signal_Strength": SignalStrength,
+            "Device_Status": status,
+            "Time_Stamp": timeStamp
             } 
         }
         x = collection.update_one(myquery, newvalues)

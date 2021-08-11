@@ -114,6 +114,8 @@ class SocketThread(threading.Thread):
                     status:str = "IDLE"
                     col = "OBD_Device_Status"
                     print("Device",status)
+                    RPM:str = "0"
+                    doc.obd_RPM(col,IMEI,RPM)
                     doc.obd_Status(col,IMEI,status)
  
             except Exception as exception:
