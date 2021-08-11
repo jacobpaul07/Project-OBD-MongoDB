@@ -119,8 +119,7 @@ class SocketThread(threading.Thread):
                     doc.obd_Status(col,IMEI,status)
  
             except Exception as exception:
-                print ("Error occured with exception:",exception)
+                print ("Error occured with exception:",exception)    
             
-            # print(self.count)
             print("--------------------------------------------------------------------------------------------")
       
