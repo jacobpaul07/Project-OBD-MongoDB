@@ -23,19 +23,27 @@ class Document:
         print(list)
         return list
 
-    def obd_Status(self,col,IMEI,status):
+    def obd_Status(self,col,IMEI,status,timeStamp):
         collection = self.db[col]
         myquery = { "IMEI": IMEI }
-        newvalues = { "$set": { "Device_Status":status} }
+        newvalues = { "$set": { 
+            "Device_Status":status,
+            "Time_Stamp":timeStamp
+            } 
+        }
         x = collection.update_one(myquery, newvalues)
         updatedCount = x.matched_count
         # print(updatedCount, "documents updated.")
         return updatedCount
     
-    def obd_RPM(self,col,IMEI,rpm):
+    def obd_RPM(self,col,IMEI,rpm,timeStamp):
         collection = self.db[col]
         myquery = { "IMEI": IMEI }
-        newvalues = { "$set": { "Rpm":rpm} }
+        newvalues = { "$set": { 
+            "Rpm":rpm,
+            "Time_Stamp":timeStamp
+            } 
+        }
         x = collection.update_one(myquery, newvalues)
         updatedCount = x.matched_count
         return updatedCount

@@ -198,7 +198,7 @@ def convert_raw_to_information(input_data):
         # MongoDB Log Login Data
         doc.obdDB_Write(login_data,IMEI)
         status = "ON"
-        update = doc.obd_Status(col,IMEI,status)
+        update = doc.obd_Status(col,IMEI,status,dateTimeIND)
         if update == 0:
             obdStatus = {
                     "OrgID": "Org001",
@@ -214,7 +214,8 @@ def convert_raw_to_information(input_data):
                     "Signal_Strength": "",
                     "timeout": "300",
                     "Device_Status": "ON",
-                    "Rpm":""
+                    "Rpm":"",
+                    "Time_Stamp":dateTimeIND
                 }
             doc.obdDB_Write(obdStatus,col)
         return login_data
@@ -258,7 +259,7 @@ def convert_raw_to_information(input_data):
         if rpm:
             print(f'Engine RPM = {rpm}')
             rpmdata = { 'RPM' : rpm, 'IMEI': IMEI,'timestamp' : dateTimeIND}
-            doc.obd_RPM(col,IMEI,rpm)
+            doc.obd_RPM(col,IMEI,rpm,dateTimeIND)
 
         else:
             print("No RPM data received")
