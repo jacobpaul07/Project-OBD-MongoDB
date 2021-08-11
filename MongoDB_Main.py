@@ -1,6 +1,6 @@
 from config.databaseconfig import Databaseconfig
 from config import databaseconfig as dbc
-
+import json
 class Document:
 
     def __init__(self):
@@ -27,7 +27,7 @@ class Document:
         collection = self.db[col]
         myquery = { "IMEI": IMEI }
         newvalues = { "$set": { "Device_Status":status} }
-        x = collection.update_many(myquery, newvalues)
+        x = collection.update_one(myquery, newvalues)
         updatedCount = x.matched_count
         # print(updatedCount, "documents updated.")
         return updatedCount
@@ -36,7 +36,7 @@ class Document:
         collection = self.db[col]
         myquery = { "IMEI": IMEI }
         newvalues = { "$set": { "Rpm":rpm} }
-        x = collection.update_many(myquery, newvalues)
+        x = collection.update_one(myquery, newvalues)
         updatedCount = x.matched_count
         return updatedCount
     
@@ -52,7 +52,7 @@ class Document:
             "Signal_Strength": SignalStrength,
             } 
         }
-        x = collection.update_many(myquery, newvalues)
+        x = collection.update_one(myquery, newvalues)
         updatedCount = x.matched_count
         # print(updatedCount, "documents updated.")
         return updatedCount
@@ -66,7 +66,9 @@ class Document:
 
 # col = "OBD_Device_Status"
 # IMEI = "866039048578802"
-# Document().obdRead_Document(col,IMEI)
+# b=(Document().obdDB_Read(col)[0])
+# a = json.dumps(b,default = str)
+# print(type(a))
 
 # from mongoengine import Document, ListField, StringField, URLField
 

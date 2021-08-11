@@ -1,5 +1,5 @@
 # Config - file
-from configparser import ConfigParser
+# from configparser import ConfigParser
 import pymongo
 
 client = None
@@ -13,12 +13,13 @@ class Databaseconfig:
         """Connects to database"""
         global client, db
         # Read config.ini file
-        config_object = ConfigParser()
+        # config_object = ConfigParser()
 
         try:
-            config_object.read("configfile.ini")
-            dataBase = config_object["DATABASE"]
-            connectionString = dataBase["localhost"]
+            # config_object.read("configfile.ini")
+            # dataBase = config_object["DATABASE"]
+            # connectionString = dataBase["localhost"]
+            connectionString = 'localhost:27017'
             client = pymongo.MongoClient(connectionString)
             # print("Connecting to MongoDB ...")
             client.admin.command('isMaster')
