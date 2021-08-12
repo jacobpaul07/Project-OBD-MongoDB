@@ -248,8 +248,8 @@ def convert_raw_to_information(input_data):
                 doc.obd_Status(col,IMEI,Status,TimeStamp)
 
         elif raw_data[0] == "H":
-            doc.obdWrite_Document(colHistory,IMEI,gps_data)
             if not gps_data["Latitude"] == "":
+                print("History ---- Stored")
                 Latitude = gps_data["Latitude"]
                 NoS = gps_data["North/South"]
                 Longitude = gps_data["Longitude"]
@@ -261,11 +261,12 @@ def convert_raw_to_information(input_data):
                 doc.obdDeviceStatusDocument(colHistory,IMEI,Latitude,NoS,Longitude,EoW,batLevel,SignalStrength,Status,TimeStamp)
                 
             else:
+                print("GPSDataHU",gps_data)
                 Status:str = "ON"
                 TimeStamp:str = dateTimeIND
                 doc.obd_Status(col,IMEI,Status,TimeStamp)
                 doc.obd_Status(colHistory,IMEI,Status,TimeStamp)
-             
+                   
         return gps_data
 
     # --------- OBD Data ---------

@@ -103,21 +103,23 @@ class SocketThread(threading.Thread):
             except timeout as  exception:
                 print("Timeout raised and caught.",exception)
                 self.currentRetryCount = self.currentRetryCount + 1
+                col = "OBD_Device_Status"
+                colHistory = "OBD_Device_Status_History"
                 if self.currentRetryCount > self.maxRetryCount:
                     status:str = "OFF"
-                    col = "OBD_Device_Status"
                     print("Device",status)
                     doc.obd_Status(col,IMEI,status,dateTimeIND)
+                    doc.obd_Status(colHistory,IMEI,status,dateTimeIND)
                     self.csocket.close()
                     self.start = False
                     self.currentRetryCount = 0
                 else:
                     status:str = "IDLE"
-                    col = "OBD_Device_Status"
                     print("Device",status)
                     RPM:str = "0"
                     doc.obd_RPM(col,IMEI,RPM,dateTimeIND)
                     doc.obd_Status(col,IMEI,status,dateTimeIND)
+                    doc.obd_Status(colHistory,IMEI,status,dateTimeIND)
  
             except Exception as exception:
                 print ("Error occured with exception:",exception)    
