@@ -93,6 +93,7 @@ class SocketThread(threading.Thread):
 
                                 print("initial:",self.gpslist_lat[0],self.gpslist_lon[0])
                                 print("live: ",lat,lon)
+                        
                         self.csocket.send(bytesPacket)
                         print ("Client at", self.clientAddress , "Packet Completely Received...")
                     

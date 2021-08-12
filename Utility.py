@@ -214,7 +214,7 @@ def convert_raw_to_information(input_data):
                     "Signal_Strength": "",
                     "timeout": "300",
                     "Device_Status": "ON",
-                    "Rpm":"",
+                    "Rpm":"0",
                     "Time_Stamp":dateTimeIND
                 }
             doc.obdDB_Write(obdStatus,col)
