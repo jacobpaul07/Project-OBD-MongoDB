@@ -190,7 +190,8 @@ def convert_raw_to_information(input_data):
     input_file = input_file.replace(';', ',')
     raw_data = input_file.split(',')
     # DB Collection
-    col = "OBD_Device_Status"
+    col:str = "OBD_Device_Status"
+    colHistory:str = "OBD_Device_Status_History"
     # --------- Check for Login packet ---------
     if len(raw_data) < 8:
         login_data = convert_LOGIN_data(raw_data)
@@ -218,6 +219,7 @@ def convert_raw_to_information(input_data):
                     "Time_Stamp":dateTimeIND
                 }
             doc.obdDB_Write(obdStatus,col)
+            doc.obdDB_Write(obdStatus,colHistory)
         return login_data
                 
 
@@ -237,15 +239,33 @@ def convert_raw_to_information(input_data):
                 batLevel = gps_data["Internal battery Level (Volts)"]
                 SignalStrength = gps_data["Signal Strength"]
                 Status:str = "ON"
-                TimeStamp = dateTimeIND
-                doc.obdDeviceStatusDocument(col,IMEI,Latitude,NoS,Longitude,EoW,batLevel,SignalStrength,Status,TimeStamp)     
-            
-        # elif raw_data[0] == "H":
-             # S3 Latest GPS 'H' Data
-            # cli.put_object(
-            #     Body=str(gps_data),
-            #     Bucket='ec2-obd2-bucket',
-            #     Key='{0}/GPS/Latest/H.txt'.format(IMEI))
+                TimeStamp:str = dateTimeIND
+                doc.obdDeviceStatusDocument(col,IMEI,Latitude,NoS,Longitude,EoW,batLevel,SignalStrength,Status,TimeStamp)
+
+            else:
+                Status:str = "ON"
+                TimeStamp:str = dateTimeIND
+                doc.obd_Status(col,IMEI,Status,TimeStamp)
+
+        elif raw_data[0] == "H":
+            doc.obdWrite_Document(colHistory,IMEI,gps_data)
+            if not gps_data["Latitude"] == "":
+                Latitude = gps_data["Latitude"]
+                NoS = gps_data["North/South"]
+                Longitude = gps_data["Longitude"]
+                EoW = gps_data["East/West"]
+                batLevel = gps_data["Internal battery Level (Volts)"]
+                SignalStrength = gps_data["Signal Strength"]
+                Status:str = "ON"
+                TimeStamp:str = dateTimeIND
+                doc.obdDeviceStatusDocument(colHistory,IMEI,Latitude,NoS,Longitude,EoW,batLevel,SignalStrength,Status,TimeStamp)
+                
+            else:
+                Status:str = "ON"
+                TimeStamp:str = dateTimeIND
+                doc.obd_Status(col,IMEI,Status,TimeStamp)
+                doc.obd_Status(colHistory,IMEI,Status,TimeStamp)
+             
         return gps_data
 
     # --------- OBD Data ---------
@@ -263,18 +283,6 @@ def convert_raw_to_information(input_data):
 
         else:
             print("No RPM data received")
-        
-        # S3 RPM Data
-        # cli.put_object(
-        #         Body=str(rpm),
-        #         Bucket='ec2-obd2-bucket',
-        #         Key='{0}/OBD/Latest/RPM.txt'.format(IMEI))
-
-        # S3 Log OBD Data
-        # cli.put_object(
-        #     Body=str(obd_data),
-        #     Bucket='ec2-obd2-bucket',
-        #     Key='{0}/OBD/Log/OBD2--{1}.txt'.format(IMEI,str(dateTimeIND)))
 
         # if raw_data[0] == "L":     
             # S3 Latest OBD 'L' Data

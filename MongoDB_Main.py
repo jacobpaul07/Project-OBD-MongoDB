@@ -73,6 +73,14 @@ class Document:
         x = collection.find_one(myquery)
         # print(updatedCount, "documents updated.")
         return x
+    
+    def obdWrite_Document(self,col,IMEI,data):
+        collection = self.db[col]
+        myquery = { "IMEI": IMEI }
+        x = collection.replace_one(myquery, data)
+        updatedCount = x.matched_count
+        # print(updatedCount, "documents updated.")
+        return updatedCount
 
 # col = "OBD_Device_Status"
 # IMEI = "866039048578802"

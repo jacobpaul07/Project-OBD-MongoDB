@@ -2,7 +2,7 @@
 import socket
 from socketThreading import SocketThread
 
-LOCALHOST = "167.233.7.5"
+LOCALHOST = "192.168.1.8"
 PORT = 21212
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)

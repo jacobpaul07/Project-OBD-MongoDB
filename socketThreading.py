@@ -107,7 +107,7 @@ class SocketThread(threading.Thread):
                     status:str = "OFF"
                     col = "OBD_Device_Status"
                     print("Device",status)
-                    doc.obd_Status(col,IMEI,status)
+                    doc.obd_Status(col,IMEI,status,dateTimeIND)
                     self.csocket.close()
                     self.start = False
                     self.currentRetryCount = 0
@@ -116,8 +116,8 @@ class SocketThread(threading.Thread):
                     col = "OBD_Device_Status"
                     print("Device",status)
                     RPM:str = "0"
-                    doc.obd_RPM(col,IMEI,RPM)
-                    doc.obd_Status(col,IMEI,status)
+                    doc.obd_RPM(col,IMEI,RPM,dateTimeIND)
+                    doc.obd_Status(col,IMEI,status,dateTimeIND)
  
             except Exception as exception:
                 print ("Error occured with exception:",exception)    
