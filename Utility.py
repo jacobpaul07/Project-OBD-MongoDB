@@ -200,6 +200,8 @@ def convert_raw_to_information(input_data):
         doc.obdDB_Write(login_data,IMEI)
         status = "ON"
         update = doc.obd_Status(col,IMEI,status,dateTimeIND)
+        Plug:str = "TRUE"
+        doc.obd_Plugedin_Status(col,IMEI,Plug,dateTimeIND)
         if update == 0:
             obdStatus = {
                     "OrgID": "Org001",
@@ -215,6 +217,7 @@ def convert_raw_to_information(input_data):
                     "Signal_Strength": "",
                     "timeout": "300",
                     "Device_Status": "ON",
+                    "Device_Plug":"True",
                     "Rpm":"0",
                     "Time_Stamp":dateTimeIND
                 }

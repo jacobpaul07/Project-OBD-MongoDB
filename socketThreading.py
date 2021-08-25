@@ -54,15 +54,15 @@ class SocketThread(threading.Thread):
                         print("Live Data: ",data)     
 
                         IMEI = fData["IMEI"]
-                        atIMEI = "@"+IMEI
-                        messageType = "00"
-                        sequenceNumber = fData["Sequence No"]
-                        checkSum = "*CS"
-                        packet = atIMEI,messageType,sequenceNumber,checkSum
-                        seperator = ","
-                        joinedPacket = seperator.join(packet)
-                        bytesPacket = bytes(joinedPacket, 'utf-8')
-                        print("Return Packet:",bytesPacket)
+                        # atIMEI = "@"+IMEI
+                        # messageType = "00"
+                        # sequenceNumber = fData["Sequence No"]
+                        # checkSum = "*CS"
+                        # packet = atIMEI,messageType,sequenceNumber,checkSum
+                        # seperator = ","
+                        # joinedPacket = seperator.join(packet)
+                        # bytesPacket = bytes(joinedPacket, 'utf-8')
+                        # print("Return Packet:",bytesPacket)
 
                         if fData["Message Type"] == "02" and fData["Live/Memory"] == "L":
                             lat = fData["Latitude"]
@@ -94,11 +94,29 @@ class SocketThread(threading.Thread):
                                 print("initial:",self.gpslist_lat[0],self.gpslist_lon[0])
                                 print("live: ",lat,lon)
                         
-                        self.csocket.send(bytesPacket)
-                        print ("Client at", self.clientAddress , "Packet Completely Received...")
+                        elif fData["Message Type"] == "06" and fData["Live/Memory"] == "L":
+                            print("Device Removed from the Vehical")
+                            col = "OBD_Device_Status"
+                            Plug:str = "FALSE"
+                            doc.obd_Plugedin_Status(col,IMEI,Plug,dateTimeIND)
+                        # self.csocket.send(bytesPacket)
+                        # print ("Client at", self.clientAddress , "Packet Completely Received...")
                     
                     else:
                         print(" 'H' data Received: ")
+                    
+                    IMEI = fData["IMEI"]
+                    atIMEI = "@"+IMEI
+                    messageType = "00"
+                    sequenceNumber = fData["Sequence No"]
+                    checkSum = "*CS"
+                    packet = atIMEI,messageType,sequenceNumber,checkSum
+                    seperator = ","
+                    joinedPacket = seperator.join(packet)
+                    bytesPacket = bytes(joinedPacket, 'utf-8')
+                    print("Return Packet:",bytesPacket)
+                    self.csocket.send(bytesPacket)
+                    print ("Client at", self.clientAddress , "Packet Completely Received...")
             
             except timeout as  exception:
                 print("Timeout raised and caught.",exception)
@@ -126,3 +144,6 @@ class SocketThread(threading.Thread):
             
             print("--------------------------------------------------------------------------------------------")
       
+
+# {"_id": {"$oid": "611377d37268d69df528d4c2"}, "Live/Memory": "L", "Signature": "ATL", "IMEI": "866039048578802", "Message Type": "06", "Sequence No": "7087", "Time (GMT)": "071005", "Date": "110821", "valid/invalid": "V", "Latitude": "", "Longitude": "", "Speed (knots)": "", "Angle of motion": "", "Odometer (KM)": "20.83",
+#  "Internal battery Level (Volts)": "4.2", "Signal Strength": "17", "Mobile country code": "404", "Mobile network code": "40", "Cell id": "1b73", "Location area code": "116f", "#Ignition(0/1), RESERVED ,Harsh Braking / Acceleration//Non(0/2/3),Main power status(0/1)": "#1031", "Over speeding": "0", "CHECKSUM": "*$"}

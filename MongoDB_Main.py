@@ -36,6 +36,19 @@ class Document:
         # print(updatedCount, "documents updated.")
         return updatedCount
     
+    def obd_Plugedin_Status(self,col,IMEI,Plug,timeStamp):
+        collection = self.db[col]
+        myquery = { "IMEI": IMEI }
+        newvalues = { "$set": { 
+            "Device_Plug":Plug,
+            "Time_Stamp":timeStamp
+            } 
+        }
+        x = collection.update_one(myquery, newvalues)
+        updatedCount = x.matched_count
+        # print(updatedCount, "documents updated.")
+        return updatedCount
+    
     def obd_RPM(self,col,IMEI,rpm,timeStamp):
         collection = self.db[col]
         myquery = { "IMEI": IMEI }
