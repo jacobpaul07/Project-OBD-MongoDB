@@ -278,8 +278,10 @@ def convert_raw_to_information(input_data):
         rpm = calculate_engine_RPM(obd_data)
         IMEI = obd_data["IMEI"]
         
-        # MongoDB Log Login Data
+        # MongoDB Log OBD Data
         doc.obdDB_Write(obd_data,IMEI)
+        Plug:str = "TRUE"
+        doc.obd_Plugedin_Status(col,IMEI,Plug,dateTimeIND)
         if rpm:
             print(f'Engine RPM = {rpm}')
             rpmdata = { 'RPM' : rpm, 'IMEI': IMEI,'timestamp' : dateTimeIND}
