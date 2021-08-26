@@ -264,7 +264,7 @@ def convert_raw_to_information(input_data):
                 doc.obdDeviceStatusDocument(colHistory,IMEI,Latitude,NoS,Longitude,EoW,batLevel,SignalStrength,Status,TimeStamp)
                 
             else:
-                print("GPSDataHU",gps_data)
+                print("GPSData",gps_data)
                 Status:str = "ON"
                 TimeStamp:str = dateTimeIND
                 doc.obd_Status(col,IMEI,Status,TimeStamp)

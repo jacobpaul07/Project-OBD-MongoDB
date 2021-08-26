@@ -54,7 +54,7 @@ class Document:
         myquery = { "IMEI": IMEI }
         newvalues = { "$set": { 
             "Rpm":rpm,
-            "Time_Stamp":timeStamp
+            "RPM_Time_Stamp":timeStamp
             } 
         }
         x = collection.update_one(myquery, newvalues)
